@@ -13,7 +13,7 @@ class Todo extends React.Component {
             },
             {
                 id: 2,
-                description: 'Singing',
+                description: 'Playing basketball',
                 isCompleted: false
             }
         ]
@@ -26,20 +26,6 @@ class Todo extends React.Component {
 
   handleChange(event) {
     this.setState({description: event.target.value});
-  }
-
-  addTodo () {
-    this.setState({
-        todos: [
-            ...this.state.todos,
-            ...[{
-                id: this.state.todos.length,
-                description: this.state.description,
-                isCompleted: false
-            }]
-        ]
-    })
-    this.setState({description: ''});
   }
 
   addTodo () {

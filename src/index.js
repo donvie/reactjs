@@ -9,6 +9,7 @@ import {
 
 import App from './App';
 import Todo from './Todo';
+import ProductTable from './ProductTable';
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/todo",
     element: <Todo />
+  },
+  {
+    path: "/product-table",
+    element: <ProductTable />
   },
 ]);
 
