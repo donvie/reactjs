@@ -1,8 +1,6 @@
-// import * as React from 'react';
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-// import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -16,28 +14,25 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Chip from '@mui/material/Chip';
 
-import Dialog from './Dialog'
+import DialogTable from './DialogTable'
 
-function createData(name, calories, fat, carbs, protein, price) {
+function createData(id, category, description, image, price, rating, title) {
   return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
+    id,
+    category,
+    description,
+    image,
     price,
+    rating,
+    title,
     history: [
       {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
+        summary: 'Atomic Habits is the definitive guide to breaking bad behaviors and adopting good ones in four steps, showing you how small, incremental, everyday routines compound into massive, positive change over time.',
+        published: '16/10/2018',
+        rating: 3,
+      }
     ],
   };
 }
@@ -46,9 +41,24 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+  const handleClickProduct = (row) => {
+    row.action = 'edit'
+    window.$product = row;
+    viewDialog.current()
+  };
+
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell component="th" scope="row"  onClick={(event) => handleClickProduct(row)}>
+          {row.id}
+        </TableCell>
+        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.title}</TableCell>
+        <TableCell onClick={(event) => handleClickProduct(row)} align="center">
+          <Chip label={row.category} />
+        </TableCell>
+        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.description}</TableCell>
+        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.price}</TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -58,13 +68,6 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {row.name}
-        </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -73,26 +76,22 @@ function Row(props) {
               <Typography variant="h6" gutterBottom component="div">
                 History
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell>Summary</TableCell>
+                    <TableCell>Published</TableCell>
+                    <TableCell align="right">Rating</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.history.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
+                  {row.history.map((historyRow, index) => (
+                    <TableRow key={index}>
                       <TableCell component="th" scope="row">
-                        {historyRow.date}
+                        {historyRow.summary}
                       </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
+                      <TableCell>{historyRow.published}</TableCell>
+                      <TableCell align="right">{historyRow.rating}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -107,42 +106,52 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
-    calories: PropTypes.string.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
+    id: PropTypes.number.isRequired,
+    category: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    rating: PropTypes.object.isRequired,
+    title: PropTypes.string.isRequired,
     history: PropTypes.arrayOf(
       PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
+        summary: PropTypes.string.isRequired,
+        published: PropTypes.string.isRequired,
+        rating: PropTypes.number.isRequired,
       }),
     ).isRequired,
-    name: PropTypes.number.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
   }).isRequired,
 };
 
-export default function CollapsibleTable() {
+let viewDialog
+
+export default function ProductTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  
+  const [productData] = React.useState({});
   
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
+  
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
 
+  const childFunc = React.useRef()
+
   useEffect(() => {
+    viewDialog = childFunc
     const fetchData = async () => {
       const response = await fetch('https://fakestoreapi.com/products');
       const newData = await response.json();
       console.log('newData', newData)
-      const mapData = newData.map(product => createData(product.id, product.title, 6.0, 24, 4.0, 3.99))
+      const mapData = newData.map(product =>
+        createData(product.id, product.category, product.description, product.image, product.price, product.rating, product.title)
+      )
       setRows(mapData);
     };
 
@@ -151,22 +160,22 @@ export default function CollapsibleTable() {
 
   return (
     <Box margin={'78px'}>
-      <Dialog></Dialog>
+      <DialogTable productData={productData} childFunc={childFunc} rows={rows} setRows={setRows}></DialogTable>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
-          <TableHead>
+          <TableHead sx={{ background: '#326295', color: '#FFFFFF' }}>
             <TableRow>
               <TableCell />
-              <TableCell>ID</TableCell>
-              <TableCell align="right">Book Title</TableCell>
-              <TableCell align="right">Author</TableCell>
-              <TableCell align="right">Category</TableCell>
-              <TableCell align="right">Price</TableCell>
+              <TableCell sx={{ color: '#FFFFFF' }}>ID</TableCell>
+              <TableCell sx={{ color: '#FFFFFF' }} align="center">Book Title</TableCell>
+              <TableCell sx={{ color: '#FFFFFF' }} align="center">Author</TableCell>
+              <TableCell sx={{ color: '#FFFFFF' }} align="center">Category</TableCell>
+              <TableCell sx={{ color: '#FFFFFF' }} align="center">Price</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-              <Row key={row.name} row={row} />
+              <Row key={row.id} row={row} />
             ))}
           </TableBody>
         </Table>

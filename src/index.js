@@ -7,9 +7,11 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import App from './App';
-import Todo from './Todo';
-import ProductTable from './ProductTable';
+import App from './pages/App';
+import Todo from './pages/Todo';
+import ProductTable from './components/ProductTable';
+
+window.product = {};
 
 const router = createBrowserRouter([
   {
