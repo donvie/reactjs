@@ -1,37 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import App from './components/ProductTable';
 import reportWebVitals from './reportWebVitals';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-
-import App from './pages/App';
-import Todo from './pages/Todo';
-import ProductTable from './components/ProductTable';
-
-window.product = {};
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />
-  },
-  {
-    path: "/todo",
-    element: <Todo />
-  },
-  {
-    path: "/product-table",
-    element: <ProductTable />
-  },
-]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 );
 
