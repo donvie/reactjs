@@ -7,7 +7,6 @@ import Grid from '@mui/material/Unstable_Grid2';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-// import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -18,8 +17,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 export default function TableDialog({rows, setRows, childFunc, productData}) {
-
-
   const [idNo, idNoValue ] = React.useState(0);
   const [bookTitle, bookTitleValue] = React.useState('');
   const [author, authorValue] = React.useState('');
@@ -27,11 +24,12 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
   const [description, descriptionValue] = React.useState('');
   const [value, setValue] = React.useState(2);
   const [open, setOpen] = React.useState(false);
+  const [value1, setValue1] = React.useState(dayjs('2014-08-18T21:11:54'));
+  const descriptionElementRef = React.useRef(null);
 
   const handleChangeIdNo = (event) => {
     idNoValue(event.target.value);
   };
-
 
   const handleChangeBookTitle = (event) => {
     bookTitleValue(event.target.value);
@@ -66,11 +64,59 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
       priceValue(price)
       descriptionValue(description)
     }
+
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const editaProduct = () => {
+    const product = {
+      category: author,
+      description: description,
+      id: parseInt(idNo),
+      image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+      price: parseInt(price),
+      rating: {rate: 3.9, count: 120},
+      title: bookTitle,
+      history: [
+        {
+          summary: 'Atomic Habits is the definitive guide to breaking bad behaviors and adopting good ones in four steps, showing you how small, incremental, everyday routines compound into massive, positive change over time.',
+          published: '16/10/2018',
+          rating: 3,
+        }
+      ]
+    }
+
+    let newArr = [...rows];
+    let index = newArr.findIndex(arr => arr.id ===  window.$product.id)
+    console.log('window.$product', window.$product)
+    console.log('newArr', newArr)
+
+    newArr[index] = product;
+  
+    setRows(newArr);
+  };
+
+  const deleteaProduct = () => {
+    let newArr = [...rows];
+    let index = newArr.findIndex(arr => arr.id ===  window.$product.id)
+    newArr.splice(index, 1);
+  
+    setRows(newArr);
+    handleClose()
+  };
+
+  const saveProduct = () => {
+    if (window.$product.action === 'edit') {
+      editaProduct()
+    } else if (window.$product.action === 'add') {
+      addaProduct()
+    } else {
+      deleteaProduct()
+    }
   };
 
   const addaProduct = () => {
@@ -99,8 +145,10 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
     descriptionValue('')
   };
 
+  const handleChange = (newValue) => {
+    setValue1(newValue);
+  };
 
-  const descriptionElementRef = React.useRef(null);
   React.useEffect(() => {
     childFunc.current = handleClickOpen()
 
@@ -111,12 +159,6 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
       }
     }
   }, [open, childFunc, productData]);
-
-
-  const [value1, setValue1] = React.useState(dayjs('2014-08-18T21:11:54'));
-  const handleChange = (newValue) => {
-    setValue1(newValue);
-  };
 
   return (
     <div>
@@ -136,7 +178,6 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
           }}
         >
           Product
-          {/* <EditIcon /> */}
           <CloseIcon onClick={handleClose} />
         </DialogTitle>
         <DialogContent>
@@ -211,7 +252,7 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
         </DialogContent>
         <DialogActions>
           <Button fullWidth variant="outlined" onClick={handleClose}>Cancel</Button>
-          <Button fullWidth variant="contained" onClick={addaProduct}>{window.$product?.action === 'edit' ? 'Edit': 'Save'}</Button>
+          <Button fullWidth variant="contained" onClick={saveProduct}>{window.$product?.action}</Button>
         </DialogActions>
       </Dialog>
     </div>

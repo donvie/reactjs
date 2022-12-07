@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,7 +16,6 @@ import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Chip from '@mui/material/Chip';
-
 import DialogTable from './DialogTable'
 
 function createData(id, category, description, image, price, rating, title) {
@@ -41,8 +41,8 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
-  const handleClickProduct = (row) => {
-    row.action = 'edit'
+  const handleClickProduct = (row, action) => {
+    row.action = action
     window.$product = row;
     viewDialog.current()
   };
@@ -50,15 +50,26 @@ function Row(props) {
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell component="th" scope="row"  onClick={(event) => handleClickProduct(row)}>
+        <TableCell component="th" scope="row">
           {row.id}
         </TableCell>
-        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.title}</TableCell>
-        <TableCell onClick={(event) => handleClickProduct(row)} align="center">
+        <TableCell align="center">{row.title}</TableCell>
+        <TableCell align="center">
           <Chip label={row.category} />
         </TableCell>
-        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.description}</TableCell>
-        <TableCell onClick={(event) => handleClickProduct(row)} align="center">{row.price}</TableCell>
+        <TableCell align="center">{row.description}</TableCell>
+        <TableCell align="center">{row.price}</TableCell>
+        <TableCell align="center">{row.price}</TableCell>
+        <TableCell align="center">
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}>
+            
+          <Button onClick={(event) => handleClickProduct(row, 'edit')}>Edit</Button>
+          <Button onClick={(event) => handleClickProduct(row, 'delete')}>Delete</Button>
+          </Box>
+        </TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -70,7 +81,7 @@ function Row(props) {
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
@@ -126,22 +137,20 @@ Row.propTypes = {
 let viewDialog
 
 export default function ProductTable() {
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  
   const [productData] = React.useState({});
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState([]);
+  const childFunc = React.useRef()
   
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
   
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState([]);
-
-  const childFunc = React.useRef()
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
   useEffect(() => {
     viewDialog = childFunc
@@ -171,6 +180,8 @@ export default function ProductTable() {
               <TableCell sx={{ color: '#FFFFFF' }} align="center">Author</TableCell>
               <TableCell sx={{ color: '#FFFFFF' }} align="center">Category</TableCell>
               <TableCell sx={{ color: '#FFFFFF' }} align="center">Price</TableCell>
+              <TableCell />
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
