@@ -1,4 +1,5 @@
 import React  from 'react';
+import Box from '@mui/material/Box';
 
 class Todo extends React.Component {
   constructor(props) {
@@ -6,16 +7,16 @@ class Todo extends React.Component {
     this.state = {
         description: '',
         todos: [
-            {
-                id: 1,
-                description: 'Coding',
-                isCompleted: false
-            },
-            {
-                id: 2,
-                description: 'Playing basketball',
-                isCompleted: false
-            }
+          {
+            id: 1,
+            description: 'Coding',
+            isCompleted: false
+          },
+          {
+            id: 2,
+            description: 'Playing basketball',
+            isCompleted: false
+          }
         ]
     };
 
@@ -30,14 +31,14 @@ class Todo extends React.Component {
 
   addTodo () {
     this.setState({
-        todos: [
-            ...this.state.todos,
-            ...[{
-                id: this.state.todos.length,
-                description: this.state.description,
-                isCompleted: false
-            }]
-        ]
+      todos: [
+        ...this.state.todos,
+        ...[{
+            id: this.state.todos.length,
+            description: this.state.description,
+            isCompleted: false
+        }]
+      ]
     })
     this.setState({description: ''});
   }
@@ -50,19 +51,19 @@ class Todo extends React.Component {
 
   render() {
     return (
-      <div>
+      <Box margin={'100px'}>
         <input placeholder="Input your todo" value={this.state.description} type="text" onChange={this.handleChange} /> <br/>
         <button onClick={this.addTodo}>Add Todo</button>
         <h1>Todos {this.state.description}</h1>
         {
-            this.state.todos.map((todo, index) => {
-                return <div key={index}>
-                    {todo.description}
-                    <button onClick={() => this.deleteTodo(index)}>X</button>
-                </div>
-            })
+          this.state.todos.map((todo, index) => {
+            return <div key={index}>
+              {todo.description}
+              <button onClick={() => this.deleteTodo(index)}>X</button>
+            </div>
+          })
         }
-      </div>
+      </Box>
     );
   }
 }

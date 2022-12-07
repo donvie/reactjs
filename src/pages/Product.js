@@ -16,7 +16,7 @@ import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Chip from '@mui/material/Chip';
-import DialogTable from './DialogTable'
+import DialogTable from '../components/DialogTable'
 
 function createData(id, category, description, image, price, rating, title) {
   return {
@@ -136,7 +136,7 @@ Row.propTypes = {
 
 let viewDialog
 
-export default function ProductTable() {
+export default function Product() {
   const [productData] = React.useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -157,7 +157,6 @@ export default function ProductTable() {
     const fetchData = async () => {
       const response = await fetch('https://fakestoreapi.com/products');
       const newData = await response.json();
-      console.log('newData', newData)
       const mapData = newData.map(product =>
         createData(product.id, product.category, product.description, product.image, product.price, product.rating, product.title)
       )
@@ -168,7 +167,7 @@ export default function ProductTable() {
   }, []);
 
   return (
-    <Box margin={'78px'}>
+    <Box margin={'100px'}>
       <DialogTable productData={productData} childFunc={childFunc} rows={rows} setRows={setRows}></DialogTable>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
@@ -192,14 +191,14 @@ export default function ProductTable() {
         </Table>
       </TableContainer>
       <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 }

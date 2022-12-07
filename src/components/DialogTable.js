@@ -49,14 +49,15 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
 
   const handleClickOpen = (action) => () => {
     if (action === 'add') {
-      window.$product = {}
+      window.$product = {
+        action: 'add'
+      }
       idNoValue(0)
       bookTitleValue('')
       authorValue('')
       priceValue(0)
       descriptionValue('')
     } else {
-      console.log('scrollType', window.$product)
       const {category, description, id, price, title} = window.$product
       idNoValue(id)
       bookTitleValue(title)
@@ -92,8 +93,6 @@ export default function TableDialog({rows, setRows, childFunc, productData}) {
 
     let newArr = [...rows];
     let index = newArr.findIndex(arr => arr.id ===  window.$product.id)
-    console.log('window.$product', window.$product)
-    console.log('newArr', newArr)
 
     newArr[index] = product;
   
